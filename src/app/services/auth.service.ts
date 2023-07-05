@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import { Endpoints } from "../endpoints";
 import {AuthResponseData} from "../interfaces/authResponseData";
-import {catchError, Observable, throwError} from "rxjs";
+import {catchError, Observable, Subject, tap, throwError} from "rxjs";
+import {UserModel} from "../models/user.model";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  user = new Subject<UserModel>()
 
   constructor(private http: HttpClient) { }
 
@@ -30,12 +32,24 @@ export class AuthService {
   signIn(email: string, password: string) {
     return this.http.post<AuthResponseData>(Endpoints.signInApi(), {email: email, password: password, returnSecureToken: true}).pipe(catchError(err => {
       return this.errorHandling(err);
+    }), tap(resData => {
+      const expirationDate = new Date(
+        new Date().getTime() + +resData.expiresIn * 1000
+      );
+      const user = new UserModel(resData.email, resData.localId, resData.idToken, expirationDate);
+      this.user.next(user);
     }));
   }
 
   signUp(email: string, password: string): Observable<AuthResponseData> {
     return this.http.post<AuthResponseData>(Endpoints.signUpApi(), {email: email, password: password, returnSecureToken: true}).pipe(catchError(err => {
       return this.errorHandling(err);
+    }), tap(resData => {
+      const expirationDate = new Date(
+        new Date().getTime() + resData.expiresIn * 1000
+      );
+      const user = new UserModel(resData.email, resData.localId, resData.idToken, expirationDate);
+      this.user.next(user);
     }));
   }
 

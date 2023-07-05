@@ -85,3 +85,7 @@
 .login-form button:focus-visible {
   background-color: #9f9f9f;
 }
+
+.disable-btn {
+  opacity: 0.4;
+}

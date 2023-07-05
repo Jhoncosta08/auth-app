@@ -1,0 +1,28 @@
+<div class="container">
+  <div class="form-container">
+
+    <div class="login-form">
+
+      <div class="login-title-container">
+        <h1>Login</h1>
+      </div>
+
+      <form>
+        <div class="form-group">
+          <input id="login-email" name="login-email" type="email" required placeholder="Email"/>
+        </div>
+
+        <div class="form-group">
+          <input id="login-password" name="login-password" type="password" required  placeholder="Password"/>
+        </div>
+
+        <div class="form-group login-form-btn-container">
+          <button id="login-submit-btn" type="submit">{{ isLoginMode ? 'login' : 'sign up' }}</button>
+          <button id="login-switch-btn" type="button" (click)="switchLoginMode()">{{ !isLoginMode ? 'switch to login' : 'switch to sign up' }}</button>
+        </div>
+      </form>
+
+    </div>
+
+  </div>
+</div>

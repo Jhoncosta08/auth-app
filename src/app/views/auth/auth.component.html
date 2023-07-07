@@ -3,7 +3,7 @@
     <div class="login-form">
 
       <div class="login-title-container">
-        <h1>Login</h1>
+        <h1>{{ isLoginMode ? 'Login' : 'Sign up' }}</h1>
       </div>
 
       <form #authForm="ngForm" (ngSubmit)="onSubmit(authForm)">

@@ -6,8 +6,9 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { AuthComponent } from './views/auth/auth.component';
 import {FormsModule} from "@angular/forms";
-import {HttpClientModule} from "@angular/common/http";
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
 import { SpinnerComponent } from './shared/spinner/spinner.component';
+import {AuthInterceptor} from "./views/auth/auth.interceptor";
 
 @NgModule({
   declarations: [
@@ -22,7 +23,7 @@ import { SpinnerComponent } from './shared/spinner/spinner.component';
     FormsModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

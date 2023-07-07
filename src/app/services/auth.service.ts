@@ -33,29 +33,47 @@ export class AuthService {
     return throwError(() => errorMessage);
   }
 
+  createNewUserData(resData: any): void {
+    const expirationDate = new Date(new Date().getTime() + resData.expiresIn * 1000 );
+    const user = new UserModel(resData.email, resData.localId, resData.idToken, expirationDate);
+    this.user.next(user);
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
   signIn(email: string, password: string): Observable<AuthResponseData> {
     return this.http.post<AuthResponseData>(Endpoints.signInApi(), {email: email, password: password, returnSecureToken: true})
-      .pipe(catchError(err => {
-        return this.errorHandling(err);
-      }), tap(resData => {
-      const expirationDate = new Date(new Date().getTime() + resData.expiresIn * 1000);
-      const user = new UserModel(resData.email, resData.localId, resData.idToken, expirationDate);
-      this.user.next(user);
-    }));
+      .pipe(
+        catchError(err => this.errorHandling(err)),
+        tap(resData => this.createNewUserData(resData))
+      );
   }
 
   signUp(email: string, password: string): Observable<AuthResponseData> {
-    return this.http.post<AuthResponseData>(Endpoints.signUpApi(), {email: email, password: password, returnSecureToken: true}).pipe(catchError(err => {
-      return this.errorHandling(err);
-    }), tap(resData => {
-      const expirationDate = new Date(new Date().getTime() + resData.expiresIn * 1000 );
-      const user = new UserModel(resData.email, resData.localId, resData.idToken, expirationDate);
-      this.user.next(user);
-    }));
+    return this.http.post<AuthResponseData>(Endpoints.signUpApi(), {email: email, password: password, returnSecureToken: true})
+      .pipe(
+        catchError(err => this.errorHandling(err)),
+        tap(resData => this.createNewUserData(resData))
+      );
   }
 
-  logout() {
+  autoLogin(): void {
+    const user: {
+      email: string,
+      id: string,
+      _token: string,
+      _tokenExpirationData: string
+    } = JSON.parse(localStorage.getItem('user') || '{}');
+    if(!user) return;
+    const loadedUser = new UserModel(user.email, user.id, user._token, new Date(user._tokenExpirationData));
+    if(loadedUser.token) {
+      this.user.next(loadedUser);
+    }
+
+  }
+
+  logout(): void {
     this.user.next(null);
+    localStorage.clear();
     void this.route.navigate([''])
   }
 

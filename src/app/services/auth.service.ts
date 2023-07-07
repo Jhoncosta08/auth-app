@@ -4,6 +4,7 @@ import { Endpoints } from "../endpoints";
 import {AuthResponseData} from "../interfaces/authResponseData";
 import {BehaviorSubject, catchError, Observable, tap, throwError} from "rxjs";
 import {UserModel} from "../models/user.model";
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,10 @@ import {UserModel} from "../models/user.model";
 export class AuthService {
   user = new BehaviorSubject<UserModel | null>(null);
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private route: Router
+  ) { }
 
   private errorHandling(error: HttpErrorResponse) {
     let errorMessage: string = 'An unknown error occurred!';
@@ -48,6 +52,11 @@ export class AuthService {
       const user = new UserModel(resData.email, resData.localId, resData.idToken, expirationDate);
       this.user.next(user);
     }));
+  }
+
+  logout() {
+    this.user.next(null);
+    void this.route.navigate([''])
   }
 
 }

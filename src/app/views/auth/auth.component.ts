@@ -3,6 +3,7 @@ import { NgForm } from "@angular/forms";
 import {AuthService} from "../../services/auth.service";
 import {AuthResponseData} from "../../interfaces/authResponseData";
 import {Observable} from "rxjs";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-auth',
@@ -13,7 +14,10 @@ export class AuthComponent {
   isLoginMode: boolean = true;
   showSpinner: boolean = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   switchLoginMode(): void {
     this.isLoginMode = !this.isLoginMode;
@@ -34,10 +38,9 @@ export class AuthComponent {
     }
 
     authObs.subscribe({
-      next: response => {
-        console.log(response);
+      next: () => {
         this.showSpinner = false;
-        authForm.resetForm();
+        void this.router.navigate(['/dashboard']);
       },
       error: error => {
         alert(error);
